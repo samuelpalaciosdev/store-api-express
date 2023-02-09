@@ -10,7 +10,7 @@ const getAllProductsStatic = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const { featured, company, name, sort } = req.query;
+  const { featured, company, name, sort, select } = req.query;
   const queryObject = {};
 
   // If property is passed, if not sent empty object and so returns all products
@@ -25,7 +25,9 @@ const getAllProducts = async (req, res) => {
   }
 
   // console.log(queryObject);
-  let result = Product.find(queryObject);
+  let result = Product.find(queryObject); //Find the products that match the queryObject props
+
+  // SORT
   if (sort) {
     // As query params are passed with commas (to separate them), replace commas with spaces
     const sortList = sort.split(',').join(' ');
@@ -33,6 +35,15 @@ const getAllProducts = async (req, res) => {
   } else {
     result = result.sort('createdAt');
   }
+
+  //SELECT
+
+  if (select) {
+    const selectList = select.split(',').join(' ');
+    result = result.select(selectList);
+  }
+
+  // RESPONSE
   const products = await result;
   res.status(200).json({
     status: 'success',
