@@ -1,0 +1,31 @@
+const express = require('express');
+const app = express();
+const PORT = process.env.PORT || 3000;
+require('dotenv').config();
+
+// Middleware
+const notFound = require('./middleware/not-found');
+const errorHandler = require('./middleware/error-handler');
+app.use(express.json());
+
+// Routes
+app.get('/', (req, res) => {
+  res.status(200).send('Home page');
+});
+
+// Utility middleware
+app.use(notFound);
+app.use(errorHandler);
+
+// Start up server
+const start = async () => {
+  try {
+    app.listen(PORT, () => {
+      console.log(`Server listening on ${PORT}`);
+    });
+  } catch (err) {
+    console.log(err);
+  }
+};
+
+start();
