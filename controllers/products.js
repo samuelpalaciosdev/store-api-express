@@ -1,7 +1,7 @@
 const Product = require('../models/product');
 
 const getAllProductsStatic = async (req, res) => {
-  const products = await Product.find({ featured: true }); // Only products with featured set to true
+  const products = await Product.find({}).sort('-name price');
   res.status(200).json({
     status: 'success',
     data: products,
