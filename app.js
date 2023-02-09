@@ -1,9 +1,12 @@
+// Requiring packages
+require('dotenv').config();
+require('express-async-errors');
+// Setup
 const express = require('express');
 const app = express();
 const PORT = process.env.PORT || 3000;
 const connectDb = require('./db/connect');
 const router = require('./routes/products');
-require('dotenv').config();
 
 // Middleware
 const notFound = require('./middleware/not-found');
@@ -11,7 +14,6 @@ const errorHandler = require('./middleware/error-handler');
 app.use(express.json());
 
 // Routes
-
 app.use('/api/v1/products', router);
 
 app.get('/', (req, res) => {
