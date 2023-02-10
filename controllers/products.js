@@ -10,7 +10,7 @@ const getAllProductsStatic = async (req, res) => {
 };
 
 const getAllProducts = async (req, res) => {
-  const { featured, company, name, sort, select } = req.query;
+  const { featured, company, name, sort, select, numericFilters } = req.query;
   const queryObject = {};
 
   // If property is passed, if not sent empty object and so returns all products
@@ -23,8 +23,33 @@ const getAllProducts = async (req, res) => {
   if (name) {
     queryObject.name = { $regex: name, $options: 'i' }; // Case insensitive search
   }
+  if (numericFilters) {
+    // Functions to swap regular operators to mongoose operators
+    const operatorMap = {
+      '>': '$gt',
+      '>=': '$gte',
+      '=': '$eq',
+      '<': '$lt',
+      '<=': '$lte',
+    };
+    const regEx = /\b(<|<=|=|>|>=)\b/g; // < | <= | = | > | >=
+    let filters = numericFilters.replace(
+      regEx,
+      match => `-${operatorMap[match]}-`
+    );
 
-  // console.log(queryObject);
+    const options = ['price', 'rating'];
+
+    // Function to pass from like price-$gt-40 to { price: { '$gt': 40 } }
+    filters = filters.split(',').forEach(item => {
+      const [field, operator, value] = item.split('-');
+      if (options.includes(field)) {
+        queryObject[field] = { [operator]: Number(value) };
+      }
+    });
+  }
+
+  console.log(queryObject);
   let result = Product.find(queryObject); //Find the products that match the queryObject props
 
   // SORT
